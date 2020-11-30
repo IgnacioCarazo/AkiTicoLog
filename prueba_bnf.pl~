@@ -1,0 +1,98 @@
+nombres(singular,sujeto, masculino,["hombre"|S], S).
+nombres(singular,objeto, femenino,["manzana"|S], S).
+nombres(plural,sujeto, masculino,["hombres"|S], S).
+nombres(plural,objeto, femenino,["manzanas"|S], S).
+verbo(plural,["comen"|S], S).
+verbo(singular,["come"|S], S).
+verbo(plural,["viven"|S], S).
+verbo(singular,["vive"|S], S).
+
+% determinantes
+determinantes(singular,articulo,masculino,["el"|S], S).
+determinantes(plural,articulo, masculino,["los"|S], S).
+determinantes(plural,pronombre, masculino, ["ellos"|S], S).
+determinantes(singular,articulo,femenino,["la"|S], S).
+determinantes(singular,pronombre,femenino, ["ella"|S], S).
+determinantes(plural,articulo,femenino ,["las"|S], S).
+determinantes(plural,pronombre,femenino, ["ellas"|S], S).
+
+
+
+
+
+oracion(S0,S) :-
+    sintagma_nominal_singular(S0, S1),
+    sintagma_verbal_singular(S1, S),!.
+
+oracion(S0,S) :-
+    sintagma_nominal_plural(S0, S1),
+    sintagma_verbal_plural(S1, S),!.
+
+% estos sintagmas nominales sirven para el sujeto (determinante/sujeto)
+sintagma_nominal_singular(S0, S) :-
+    determinantes(singular, articulo, masculino,S0, S1),
+    nombres(singular,sujeto, masculino,S1, S).
+
+sintagma_nominal_singular(S0, S) :-
+    determinantes(singular, articulo,femenino,S0, S1),
+    nombres(singular,sujeto, femenino,S1, S).
+
+sintagma_nominal_plural(S0, S) :-
+    determinantes(plural, articulo,masculino,S0, S1),
+    nombres(plural,sujeto, masculino,S1, S).
+
+sintagma_nominal_plural(S0, S) :-
+    determinantes(plural, articulo,femenino,S0, S1),
+    nombres(plural,sujeto, femenino,S1, S).
+
+
+% estos sintagmas nominales sirven para el objeto
+
+sintagma_nominal_singular(S0, S, objeto) :-
+    determinantes(singular, articulo, masculino,S0, S1),
+    nombres(singular,objeto, masculino,S1, S).
+
+sintagma_nominal_singular(S0, S, objeto) :-
+    determinantes(singular, articulo,femenino,S0, S1),
+    nombres(singular,objeto, femenino,S1, S).
+
+sintagma_nominal_plural(S0, S, objeto) :-
+    determinantes(plural, articulo,masculino,S0, S1),
+    nombres(plural,objeto, masculino,S1, S).
+
+sintagma_nominal_plural(S0, S, objeto) :-
+    determinantes(plural, articulo,femenino,S0, S1),
+    nombres(plural,objeto, femenino,S1, S).
+
+
+sintagma_verbal_singular(S0, S) :-
+    verbo(singular,S0, S).
+
+sintagma_verbal_singular(S0, S) :-
+    verbo(singular, S0, S1),
+    sintagma_nominal_singular(S1, S, objeto).
+
+sintagma_verbal_singular(S0, S) :-
+    verbo(singular, S0, S1),
+    sintagma_nominal_plural(S1, S, objeto).
+
+
+sintagma_verbal_plural(S0, S) :-
+    verbo(plural,S0, S).
+
+sintagma_verbal_plural(S0, S) :-
+    verbo(plural, S0, S1),
+    sintagma_nominal_plural(S1, S, objeto).
+
+
+sintagma_verbal_plural(S0, S) :-
+    verbo(plural, S0, S1),
+    sintagma_nominal_singular(S1, S, objeto).
+
+pruebaread() :-
+    write_ln("Indique una oracion"),
+    read(Input),
+    split_string(Input," ","",L),
+    write_ln(L),
+    oracion(L, []).
+
