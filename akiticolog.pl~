@@ -276,20 +276,22 @@ pregunta1() :-
     verificar_datos(L, Palabra, Atributo),
     write_ln(Palabra),
     write_ln(Atributo),
-    famositico(S,_,_,_,Atributo,_,_,_),
+    famositico(S,_,_,_,_,_,_,Atributo),
     write(S).
 
-% idea:
-% Pregunta 1: Formar una lista con los famositicos que cumplen con el
-% atributo ingresado por el usuario.
-% Pregunta 2: A partir de la lista formada en la pregunta 1, dejar solo
-% los famositicos que tambien cumplan con el atributo ingresado por el
-% usuario en la pregunta 2.
-% Pregunta 3: A partir de la lista formada en la pregunta 2, repetir los
-% pasos y dejar en la lista solo a los famositicos que cumplan con los
-% atributos. De esta forma solo estarian en la lista los famositicos que
-% cumplan con los 3 diferentes atributos ingresados.
-%
+% ###por ahora esta fallando con las estaturas entonces estoy pensando
+% en quitar ese atributo de los famositicos###
+
+% idea: Pregunta 1: Formar una
+% lista con los famositicos que cumplen con el atributo ingresado por el
+% usuario. Pregunta 2: A partir de la lista formada en la pregunta 1,
+% dejar solo los famositicos que tambien cumplan con el atributo
+% ingresado por el usuario en la pregunta 2. Pregunta 3: A partir de la
+% lista formada en la pregunta 2, repetir los pasos y dejar en la lista
+% solo a los famositicos que cumplan con los atributos. De esta forma
+% solo estarian en la lista los famositicos que cumplan con los 3
+% diferentes atributos ingresados.
+
 % Seguir esta secuencia por todas las preguntas necesarias hasta tener
 % una lista de longitud = 1, que significa que solo hay un famositico
 % que cumple con todos esos atributos ingresados.
