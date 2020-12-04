@@ -58,6 +58,9 @@ atributo(["periodista"|S],S).
 %si y no
 negacion_afirmacion(["si"|S],S).
 negacion_afirmacion(["no"|S],S).
+negacion_afirmacion(["si,"|S],S).
+negacion_afirmacion(["no,"|S],S).
+
 
 %articulos
 determinante(["en"|S],S).
@@ -80,14 +83,33 @@ palabras_clave("es").
 carac_fisicas_clave("pelo").
 carac_fisicas_clave("ojos").
 
-% famositico(nombre,edad,lugar de nacimiento, color de pelo, estatura,
+% famositico(nombre,edad,lugar de nacimiento, color de pelo,
 % profesion, color de ojos)
 % ##############POR AHORA SOLO ESTAN CORRECTOS LOS DATOS DE HANNAH, LOS
 % DEMAS SON PARA PROBAR.###############
-famositico("Hanna Gabriels","35","alajuela","negro","1.87m","boxeadora","verdes","mujer").
-famositico("Keylor Navas","34","cartago","cafe","1.80m","boxeadora","cafes","hombre").
-famositico("Choche Romano","30","sanjose","cafe","1.78m","comediante","negros","hombre").
-famositico("Edgar Silva","35","heredia","negro","1.70m","periodista","cafes","hombre").
+famositico("Hanna Gabriels","35","alajuela","negro","boxeadora","verdes","mujer").
+famositico("Keylor Navas","34","cartago","cafe","boxeadora","cafes","hombre").
+famositico("Choche Romano","30","sanjose","cafe","comediante","negros","hombre").
+famositico("Edgar Silva","35","heredia","negro","periodista","cafes","hombre").
+
+get_famositico(Famositico,[Pelo|ListaAtributos]) :-
+     get_famositico(Famositico,Pelo,ListaAtributos).
+
+
+get_famositico(Famositico, Pelo, [Ojos|ListaAtributos]) :-
+    get_famositico(Famositico,Pelo,Ojos,ListaAtributos).
+
+get_famositico(Famositico, Pelo, Ojos, [ProvinciaNacimiento|ListaAtributos]) :-
+    get_famositico(Famositico,Pelo,Ojos,ProvinciaNacimiento,ListaAtributos).
+
+get_famositico(Famositico, Pelo, Ojos, ProvinciaNacimiento, [Profesion|ListaAtributos]) :-
+    get_famositico(Famositico, Pelo, Ojos, ProvinciaNacimiento, Profesion, ListaAtributos).
+
+get_famositico(Famositico, Pelo, Ojos, ProvinciaNacimiento, Profesion, [Edad|ListaAtributos]) :-
+    get_famositico(Famositico, Pelo, Ojos, ProvinciaNacimiento, Profesion, Edad, ListaAtributos).
+
+get_famositico(Famositico, Pelo, Ojos, ProvinciaNacimiento, Profesion, Edad, [Sexo|ListaAtributos]) :-
+    famositico(Famositico,Edad,ProvinciaNacimiento,Pelo,Profesion,Ojos,Sexo).
 
 
 % una oracion pronombre/verbo/determinante/objeto/atributo del objeto
@@ -99,9 +121,17 @@ oracion(S0, S) :-
 
 % una oracion que puede solamente ser si o no
 % por ejemplo: si.
+
 oracion(S0, S) :-
     negacion_afirmacion(S0,S).
 
+% una oracion con un si o no y luego diciendo que es
+% por ejemplo: si, es boxeadora o no, es actriz
+
+oracion(S0, S) :-
+    negacion_afirmacion(S0,S1),
+    sintagma_nominal(S1,S2),
+    sintagma_verbal(S2,S).
 
 
 % pronombre
@@ -157,19 +187,18 @@ sintagma_verbal(S0, S) :-
 % que tambien tengan los famositicos
 
 buscar_data("es", L, Sexo) :-
-    famositico(_,_,_,_,_,_,_,Sexo),
+    famositico(_,_,_,_,_,_,Sexo),
     buscar_palabra(Sexo, L),
     !.
 
 buscar_data("tiene", L, Edad) :-
-    famositico(_,Edad,_,_,_,_,_,_),
+    famositico(_,Edad,_,_,_,_,_),
     buscar_palabra(Edad, L),
     !.
 
 buscar_data("nacio", L, Lugar) :-
-    famositico(_,_,Lugar,_,_,_,_,_),
+    famositico(_,_,Lugar,_,_,_,_),
     buscar_palabra(Lugar, L),
-    write_ln("Ella nacio en"),
     !.
 
 buscar_data("tiene", L, Atributo) :-
@@ -178,25 +207,20 @@ buscar_data("tiene", L, Atributo) :-
     atributo_fisico(Caracteristica, L, Atributo),
     !.
 
-buscar_data("mide", L, Estatura) :-
-    famositico(_,_,_,_,Estatura,_,_,_),
-    buscar_palabra(Estatura, L),
-    !.
-
 buscar_data("es", L, Profesion) :-
-    famositico(_,_,_,_,_,Profesion,_,_),
+    famositico(_,_,_,_,Profesion,_,_),
     buscar_palabra(Profesion, L),
     !.
 
 
 %atributo_fisico
 atributo_fisico("ojos", L, Atributo) :-
-    famositico(_,_,_,_,_,_,Atributo,_),
+    famositico(_,_,_,_,_,Atributo,_),
     atributo(color,[Atributo|_],_),
     buscar_palabra(Atributo, L).
 
 atributo_fisico("pelo", L, Atributo) :-
-    famositico(_,_,_,Atributo,_,_,_,_),
+    famositico(_,_,_,Atributo,_,_,_),
     atributo(color,[Atributo|_],_),
     buscar_palabra(Atributo, L).
 
@@ -226,7 +250,11 @@ verificar_datos(L, Palabra, Atributo) :-
 
 verificar_datos(L, Palabra, Atributo) :-
     not(determinar_dato_a_buscar(L, Palabra, Atributo)),
-    write("La base de datos no presenta a nadie con esas caracteristicas, vuelva a intentar"),!.
+    write("La base de datos no presenta a nadie con esas caracteristicas, vuelva a intentar"), false.
+
+concatenar([],L,L).
+concatenar([X|L1],L2,[X|L3]) :-
+    concatenar(L1,L2,L3).
 
 verificar_oracion(L) :-
     oracion(L,[]),!.
@@ -235,11 +263,11 @@ verificar_oracion(L) :-
     not(oracion(L,[])),
     write_ln(""),
     write_ln("La oracion no es reconocida por AkiTicoLog, vuelva a intentar"),
-    write_ln(""), !.
+    write_ln(""), false.
 
 verifica_input("listo") :-
     write_ln(""),
-    pregunta1.
+    pregunta1([]).
 
 verifica_input("no he decidido") :-
     write_ln(""),
@@ -267,17 +295,106 @@ akiticolog() :-
 
 
 
-pregunta1() :-
+pregunta1(ListaAnterior) :-
     write_ln("Tu personaje es hombre o mujer?"),write_ln(""),
     read(Input),
     split_string(Input," ","",L),
     write_ln(L),
     verificar_oracion(L),
-    verificar_datos(L, Palabra, Atributo),
+    determinar_dato_a_buscar(L, Palabra, Atributo),
     write_ln(Palabra),
     write_ln(Atributo),
-    famositico(S,_,_,_,_,_,_,Atributo),
-    write(S).
+    concatenar([Atributo],ListaAnterior,ListaAtributos),
+    write(ListaAtributos),
+    pregunta2(ListaAtributos).
+
+
+
+pregunta2(ListaAnterior) :-
+    write_ln("      "),
+    write_ln("Mmm interesante..."),
+    write_ln("Que edad tiene tu personaje?"),
+    read(Input),
+    split_string(Input," ","",L),
+    write_ln(L),
+    verificar_oracion(L),
+    determinar_dato_a_buscar(L, Palabra, Atributo),
+    write_ln(Palabra),
+    write_ln(Atributo),
+    concatenar([Atributo],ListaAnterior,ListaAtributos),
+    write(ListaAtributos),
+    pregunta3(ListaAtributos).
+
+
+pregunta3(ListaAnterior) :-
+    write_ln("      "),
+    write_ln("Aun no es suficiente para adivinar"),
+    write_ln("Dime cual es la profesion de tu famositico."),
+    read(Input),
+    split_string(Input," ","",L),
+    write_ln(L),
+    verificar_oracion(L),
+    determinar_dato_a_buscar(L, Palabra, Atributo),
+    write_ln(Palabra),
+    write_ln(Atributo),
+    concatenar([Atributo],ListaAnterior,ListaAtributos),
+    write(ListaAtributos),
+    pregunta4(ListaAtributos).
+
+
+pregunta4(ListaAnterior) :-
+    write_ln("      "),
+    write_ln("En que provincia nacio a persona en la que estas pensando?"),
+    read(Input),
+    split_string(Input," ","",L),
+    write_ln(L),
+    verificar_oracion(L),
+    determinar_dato_a_buscar(L, Palabra, Atributo),
+    write_ln(Palabra),
+    write_ln(Atributo),
+    concatenar([Atributo],ListaAnterior,ListaAtributos),
+    write(ListaAtributos),
+    pregunta5(ListaAtributos).
+
+pregunta5(ListaAnterior) :-
+    write_ln("      "),
+    write_ln("Todavia necesito alguna caracteristica fisica"),
+    write_ln("De que color son los ojos de tu personaje?"),
+    read(Input),
+    split_string(Input," ","",L),
+    write_ln(L),
+    verificar_oracion(L),
+    determinar_dato_a_buscar(L, Palabra, Atributo),
+    write_ln(Palabra),
+    write_ln(Atributo),
+    concatenar([Atributo],ListaAnterior,ListaAtributos),
+    write(ListaAtributos),
+    pregunta6(ListaAtributos).
+
+
+pregunta6(ListaAnterior) :-
+    write_ln("      "),
+   write_ln("Dime el color del cabello tambien."),
+    read(Input),
+    split_string(Input," ","",L),
+    write_ln(L),
+    verificar_oracion(L),
+    determinar_dato_a_buscar(L, Palabra, Atributo),
+    write_ln(Palabra),
+    write_ln(Atributo),
+    concatenar([Atributo],ListaAnterior,ListaAtributos),
+    write(ListaAtributos),
+    get_famositico(Famositico, ListaAtributos),
+    write("Estas pensando en "),
+    write(Famositico).
+
+
+
+
+
+
+
+
 
 % ###por ahora esta fallando con las estaturas entonces estoy pensando
 % en quitar ese atributo de los famositicos###
