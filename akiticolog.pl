@@ -23,6 +23,7 @@ verbo(singular, ["nacio"|S], S).
 verbo(singular, ["es"|S],S).
 verbo(singular, ["fue"|S],S).
 verbo(singular, ["mide"|S],S).
+verbo(singular, ["fue"|S],S).
 
 %colores
 atributo(color,["negro"|S],S).
@@ -39,7 +40,7 @@ atributo(color,["verdes"|S],S).
 atributo(color,["celestes"|S],S).
 atributo(color,["rojos"|S],S).
 
-%edades y estaturas
+%edades
 atributo(["20"|S],S).
 atributo(["21"|S],S).
 atributo(["22"|S],S).
@@ -117,6 +118,9 @@ determinante(["el"|S],S).
 determinante(["la"|S],S).
 determinante(["los"|S],S).
 
+un_una(["un"|S],S).
+un_una(["una"|S],S).
+
 %pronombres
 determinante(pronombre,femenino, ["ella"|S], S).
 determinante(pronombre,masculino, ["el"|S], S).
@@ -129,6 +133,7 @@ palabras_clave("murio").
 palabras_clave("tiene").
 palabras_clave("dedica").
 palabras_clave("es").
+palabras_clave("fue").
 carac_fisicas_clave("pelo").
 carac_fisicas_clave("ojos").
 
@@ -239,6 +244,14 @@ sintagma_verbal(S0, S) :-
     verbo(singular, S0, S1),
     atributo(S1, S).
 
+% verbo/un-una/atributo
+% por ejemplo: es un futbolista, fue una actriz, es una mujer, etc
+sintagma_verbal(S0, S) :-
+    verbo(singular, S0, S1),
+    un_una(S1,S2),
+    atributo(S2, S).
+
+
 % verbo/sintagma nominal
 % por ejemplo: vive en alajuela, tiene el pelo cafe
 sintagma_verbal(S0, S) :-
@@ -251,6 +264,13 @@ sintagma_verbal(S0, S) :-
 % en la oracion "ella nacio en alajuela" se busca una palabra clave, en
 % este caso "nacio". Como la palabra clave es nacio busca si dentro del
 % input del usuario hay algun dato (alguna provincia en este caso), que
+
+
+buscar_data("fue", L, Profesion) :-
+    atributo([Profesion|_],_),
+    buscar_palabra(Profesion, L),
+    !.
+
  buscar_data("es", L, Sexo) :-
     atributo([Sexo,_],_),
     buscar_palabra(Sexo, L),
@@ -276,6 +296,8 @@ buscar_data("es", L, Profesion) :-
     atributo([Profesion|_],_),
     buscar_palabra(Profesion, L),
     !.
+
+
 
 %atributo_fisico
 atributo_fisico("ojos", L, Atributo) :-

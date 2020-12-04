@@ -23,6 +23,7 @@ verbo(singular, ["nacio"|S], S).
 verbo(singular, ["es"|S],S).
 verbo(singular, ["fue"|S],S).
 verbo(singular, ["mide"|S],S).
+verbo(singular, ["fue"|S],S).
 
 %colores
 atributo(color,["negro"|S],S).
@@ -39,7 +40,7 @@ atributo(color,["verdes"|S],S).
 atributo(color,["celestes"|S],S).
 atributo(color,["rojos"|S],S).
 
-%edades y estaturas
+%edades
 atributo(["20"|S],S).
 atributo(["21"|S],S).
 atributo(["22"|S],S).
@@ -81,6 +82,12 @@ atributo(["57"|S],S).
 atributo(["58"|S],S).
 atributo(["59"|S],S).
 atributo(["60"|S],S).
+atributo(["61"|S],S).
+atributo(["62"|S],S).
+atributo(["63"|S],S).
+atributo(["64"|S],S).
+atributo(["65"|S],S).
+
 
 
 %sexo
@@ -96,6 +103,7 @@ atributo(["cantante"|S],S).
 atributo(["presidente"|S],S).
 atributo(["influencer"|S],S).
 atributo(["periodista"|S],S).
+atributo(["modelo"|S],S).
 
 %si y no
 negacion_afirmacion(["si"|S],S).
@@ -110,6 +118,9 @@ determinante(["el"|S],S).
 determinante(["la"|S],S).
 determinante(["los"|S],S).
 
+un_una(["un"|S],S).
+un_una(["una"|S],S).
+
 %pronombres
 determinante(pronombre,femenino, ["ella"|S], S).
 determinante(pronombre,masculino, ["el"|S], S).
@@ -122,6 +133,7 @@ palabras_clave("murio").
 palabras_clave("tiene").
 palabras_clave("dedica").
 palabras_clave("es").
+palabras_clave("fue").
 carac_fisicas_clave("pelo").
 carac_fisicas_clave("ojos").
 
@@ -135,7 +147,16 @@ famositico("Edgar Silva","55","guanacaste","negro","periodista","cafes","hombre"
 famositico("Nane Miller", "26","sanjose","macho","influencer","verdes","mujer").
 famositico("Mauricio Hoffman","37", "sanjose", "macho", "periodista","negros","hombre").
 famositico("Mauricio 'El Chunche' Montero", "57","alajuela","negro", "futbolista", "negros","hombre").
+famositico("Debi Nova", "40", "sanjose","cafe","cantante","azules","mujer").
+famositico("Maribel Guardia", "61", "sanjose", "negro", "actriz", "negros","mujer").
+famositico("Johanna Solano","30", "sanjose","cafe","modelo", "cafes", "mujer").
+famositico("Bryan Ruiz", "35","sanjose","negro","futbolista","negros","hombre").
 
+% por medio de la ListaAtributos que se obtiene conforme se van
+% preguntando las preguntas compara los famositicos dentro de la base de
+% datos con esos atributos y obtiene el famositico que los cumple y de
+% no cumplirlo le avisa al usuario que esos atributos no pertenecen a
+% nadie de la base de datos
 
 get_famositico(Famositico,[Pelo|ListaAtributos]) :-
      get_famositico(Famositico,Pelo,ListaAtributos).
@@ -167,11 +188,13 @@ oracion(S0, S) :-
 
 % una oracion que puede solamente ser si o no
 % por ejemplo: si.
+% NO SE USO
 oracion(S0, S) :-
     negacion_afirmacion(S0,S).
 
 % una oracion con un si o no y luego diciendo que es
 % por ejemplo: si, es boxeadora o no, es actriz
+% NO SE USO
 oracion(S0, S) :-
     negacion_afirmacion(S0,S1),
     sintagma_nominal(S1,S2),
@@ -221,6 +244,14 @@ sintagma_verbal(S0, S) :-
     verbo(singular, S0, S1),
     atributo(S1, S).
 
+% verbo/un-una/atributo
+% por ejemplo: es un futbolista, fue una actriz, es una mujer, etc
+sintagma_verbal(S0, S) :-
+    verbo(singular, S0, S1),
+    un_una(S1,S2),
+    atributo(S2, S).
+
+
 % verbo/sintagma nominal
 % por ejemplo: vive en alajuela, tiene el pelo cafe
 sintagma_verbal(S0, S) :-
@@ -233,6 +264,13 @@ sintagma_verbal(S0, S) :-
 % en la oracion "ella nacio en alajuela" se busca una palabra clave, en
 % este caso "nacio". Como la palabra clave es nacio busca si dentro del
 % input del usuario hay algun dato (alguna provincia en este caso), que
+
+
+buscar_data("fue", L, Profesion) :-
+    atributo([Profesion|_],_),
+    buscar_palabra(Profesion, L),write(Profesion),
+    !.
+
  buscar_data("es", L, Sexo) :-
     atributo([Sexo,_],_),
     buscar_palabra(Sexo, L),
@@ -257,7 +295,9 @@ buscar_data("tiene", L, Atributo) :-
 buscar_data("es", L, Profesion) :-
     atributo([Profesion|_],_),
     buscar_palabra(Profesion, L),
-    !.
+    write(Profesion),!.
+
+
 
 %atributo_fisico
 atributo_fisico("ojos", L, Atributo) :-
@@ -287,11 +327,12 @@ buscar_palabra(Elemento, [Elemento|_]).
 buscar_palabra(Elemento, [_|Lista]) :-
     buscar_palabra(Elemento, Lista).
 
-
+% concatena listas
 concatenar([],L,L).
 concatenar([X|L1],L2,[X|L3]) :-
     concatenar(L1,L2,L3).
 
+% verifica que la oracion cumpla los estandares de BNF
 verificar_oracion(L) :-
     oracion(L,[]),!.
 
@@ -336,6 +377,7 @@ pregunta1(ListaAnterior) :-
     read(Input),
     split_string(Input," ","",L),
     verificar_oracion(L),
+    write(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
     pregunta2(ListaAtributos).
