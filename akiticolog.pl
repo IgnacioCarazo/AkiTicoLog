@@ -81,6 +81,12 @@ atributo(["57"|S],S).
 atributo(["58"|S],S).
 atributo(["59"|S],S).
 atributo(["60"|S],S).
+atributo(["61"|S],S).
+atributo(["62"|S],S).
+atributo(["63"|S],S).
+atributo(["64"|S],S).
+atributo(["65"|S],S).
+
 
 
 %sexo
@@ -96,6 +102,7 @@ atributo(["cantante"|S],S).
 atributo(["presidente"|S],S).
 atributo(["influencer"|S],S).
 atributo(["periodista"|S],S).
+atributo(["modelo"|S],S).
 
 %si y no
 negacion_afirmacion(["si"|S],S).
@@ -135,7 +142,16 @@ famositico("Edgar Silva","55","guanacaste","negro","periodista","cafes","hombre"
 famositico("Nane Miller", "26","sanjose","macho","influencer","verdes","mujer").
 famositico("Mauricio Hoffman","37", "sanjose", "macho", "periodista","negros","hombre").
 famositico("Mauricio 'El Chunche' Montero", "57","alajuela","negro", "futbolista", "negros","hombre").
+famositico("Debi Nova", "40", "sanjose","cafe","cantante","azules","mujer").
+famositico("Maribel Guardia", "61", "sanjose", "negro", "actriz", "negros","mujer").
+famositico("Johanna Solano","30", "sanjose","cafe","modelo", "cafes", "mujer").
+famositico("Bryan Ruiz", "35","sanjose","negro","futbolista","negros","hombre").
 
+% por medio de la ListaAtributos que se obtiene conforme se van
+% preguntando las preguntas compara los famositicos dentro de la base de
+% datos con esos atributos y obtiene el famositico que los cumple y de
+% no cumplirlo le avisa al usuario que esos atributos no pertenecen a
+% nadie de la base de datos
 
 get_famositico(Famositico,[Pelo|ListaAtributos]) :-
      get_famositico(Famositico,Pelo,ListaAtributos).
@@ -167,11 +183,13 @@ oracion(S0, S) :-
 
 % una oracion que puede solamente ser si o no
 % por ejemplo: si.
+% NO SE USO
 oracion(S0, S) :-
     negacion_afirmacion(S0,S).
 
 % una oracion con un si o no y luego diciendo que es
 % por ejemplo: si, es boxeadora o no, es actriz
+% NO SE USO
 oracion(S0, S) :-
     negacion_afirmacion(S0,S1),
     sintagma_nominal(S1,S2),
@@ -287,11 +305,12 @@ buscar_palabra(Elemento, [Elemento|_]).
 buscar_palabra(Elemento, [_|Lista]) :-
     buscar_palabra(Elemento, Lista).
 
-
+% concatena listas
 concatenar([],L,L).
 concatenar([X|L1],L2,[X|L3]) :-
     concatenar(L1,L2,L3).
 
+% verifica que la oracion cumpla los estandares de BNF
 verificar_oracion(L) :-
     oracion(L,[]),!.
 

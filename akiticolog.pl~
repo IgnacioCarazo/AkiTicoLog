@@ -11,9 +11,10 @@ nombre(["heredia"|S], S).
 nombre(["puntarenas"|S], S).
 nombre(["limon"|S], S).
 
-%mi personaje
+%mi personaje/famositico
 mi(["mi"|S],S).
 personaje(["personaje"|S],S).
+personaje(["famositico"|S],S).
 
 %verbos
 verbo(singular,["vive"|S], S).
@@ -367,7 +368,7 @@ pregunta3(ListaAnterior) :-
 
 pregunta4(ListaAnterior) :-
     write_ln(""),
-    write_ln("En que provincia nacio a persona en la que estas pensando?"), write_ln(""),
+    write_ln("En que provincia nacio la persona en la que estas pensando?"), write_ln(""),
     read(Input),
     split_string(Input," ","",L),
     verificar_oracion(L),
@@ -395,7 +396,7 @@ pregunta6(ListaAnterior) :-
     verificar_oracion(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
-    get_famositico(Famositico, ListaAtributos),
+    get_famositico(Famositico, ListaAtributos), write_ln(""),
     write("Estas pensando en "),
     write(Famositico),
     write("?"), write_ln("").
