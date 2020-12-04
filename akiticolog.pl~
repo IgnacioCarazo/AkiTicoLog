@@ -28,6 +28,7 @@ atributo(color,["negro"|S],S).
 atributo(color,["cafe"|S],S).
 atributo(color,["azul"|S],S).
 atributo(color,["verde"|S],S).
+atributo(color,["macho"|S],S).
 atributo(color,["celeste"|S],S).
 atributo(color,["rojo"|S],S).
 atributo(color,["negros"|S],S).
@@ -38,8 +39,48 @@ atributo(color,["celestes"|S],S).
 atributo(color,["rojos"|S],S).
 
 %edades y estaturas
+atributo(["20"|S],S).
+atributo(["21"|S],S).
+atributo(["22"|S],S).
+atributo(["23"|S],S).
+atributo(["24"|S],S).
+atributo(["25"|S],S).
+atributo(["26"|S],S).
+atributo(["27"|S],S).
+atributo(["28"|S],S).
+atributo(["29"|S],S).
+atributo(["30"|S],S).
+atributo(["31"|S],S).
+atributo(["32"|S],S).
+atributo(["33"|S],S).
+atributo(["34"|S],S).
 atributo(["35"|S],S).
-atributo(["1.87m"|S],S).
+atributo(["36"|S],S).
+atributo(["37"|S],S).
+atributo(["38"|S],S).
+atributo(["39"|S],S).
+atributo(["40"|S],S).
+atributo(["41"|S],S).
+atributo(["42"|S],S).
+atributo(["43"|S],S).
+atributo(["44"|S],S).
+atributo(["45"|S],S).
+atributo(["46"|S],S).
+atributo(["47"|S],S).
+atributo(["48"|S],S).
+atributo(["49"|S],S).
+atributo(["50"|S],S).
+atributo(["51"|S],S).
+atributo(["52"|S],S).
+atributo(["53"|S],S).
+atributo(["54"|S],S).
+atributo(["55"|S],S).
+atributo(["56"|S],S).
+atributo(["57"|S],S).
+atributo(["58"|S],S).
+atributo(["59"|S],S).
+atributo(["60"|S],S).
+
 
 %sexo
 atributo(["hombre"|S],S).
@@ -83,18 +124,24 @@ palabras_clave("es").
 carac_fisicas_clave("pelo").
 carac_fisicas_clave("ojos").
 
+
 % famositico(nombre,edad,lugar de nacimiento, color de pelo,
-% profesion, color de ojos)
-% ##############POR AHORA SOLO ESTAN CORRECTOS LOS DATOS DE HANNAH, LOS
-% DEMAS SON PARA PROBAR.###############
+% profesion, color de ojos, sexo)
 famositico("Hanna Gabriels","35","alajuela","negro","boxeadora","verdes","mujer").
-famositico("Keylor Navas","34","cartago","cafe","boxeadora","cafes","hombre").
-famositico("Choche Romano","30","sanjose","cafe","comediante","negros","hombre").
-famositico("Edgar Silva","35","heredia","negro","periodista","cafes","hombre").
+famositico("Keylor Navas","33","sanjose","negro","futbolista","negros","hombre").
+famositico("Alvaro Saborio","38","alajuela","negro","futbolista","negros","hombre").
+famositico("Edgar Silva","55","guanacaste","negro","periodista","cafes","hombre").
+famositico("Nane Miller", "26","sanjose","macho","influencer","verdes","mujer").
+famositico("Mauricio Hoffman","37", "sanjose", "macho", "periodista","negros","hombre").
+famositico("Mauricio 'El Chunche' Montero", "57","alajuela","negro", "futbolista", "negros","hombre").
+
 
 get_famositico(Famositico,[Pelo|ListaAtributos]) :-
      get_famositico(Famositico,Pelo,ListaAtributos).
 
+get_famositico(Famositico,[Pelo|ListaAtributos]) :-
+     not(get_famositico(Famositico,Pelo,ListaAtributos)),
+     write_ln("No he podido adivinar tu personaje. Es probable que no esta en mi base de datos, vuelve a intentarlo de nuevo con alguien mas!"), false.
 
 get_famositico(Famositico, Pelo, [Ojos|ListaAtributos]) :-
     get_famositico(Famositico,Pelo,Ojos,ListaAtributos).
@@ -111,28 +158,28 @@ get_famositico(Famositico, Pelo, Ojos, ProvinciaNacimiento, Profesion, [Edad|Lis
 get_famositico(Famositico, Pelo, Ojos, ProvinciaNacimiento, Profesion, Edad, [Sexo|ListaAtributos]) :-
     famositico(Famositico,Edad,ProvinciaNacimiento,Pelo,Profesion,Ojos,Sexo).
 
-
 % una oracion pronombre/verbo/determinante/objeto/atributo del objeto
 % por ejemplo: ella tiene el pelo cafe.
 oracion(S0, S) :-
     sintagma_nominal(S0,S1),
     sintagma_verbal(S1,S).
 
-
 % una oracion que puede solamente ser si o no
 % por ejemplo: si.
-
 oracion(S0, S) :-
     negacion_afirmacion(S0,S).
 
 % una oracion con un si o no y luego diciendo que es
 % por ejemplo: si, es boxeadora o no, es actriz
-
 oracion(S0, S) :-
     negacion_afirmacion(S0,S1),
     sintagma_nominal(S1,S2),
     sintagma_verbal(S2,S).
 
+%esta oracion permite que sea solo verbo atributo
+%por ejemplo: tiene 35, es boxeadora, etc.
+oracion(S0,S) :-
+     sintagma_verbal(S0,S).
 
 % pronombre
 sintagma_nominal(S0, S) :-
@@ -142,9 +189,6 @@ sintagma_nominal(S0, S) :-
 sintagma_nominal(S0, S) :-
     mi(S0,S1),
     personaje(S1,S).
-
-
-
 
 % determinante/objeto/atributo
 % por ejemplo: el pelo cafe, el pelo azul, etc
@@ -158,6 +202,11 @@ sintagma_nominal(S0, S) :-
     nombre(S1,S2),
     atributo(color,S2,S).
 
+% nombre/atributo
+% por ejemplo: pelo fafe, ojos celestes
+sintagma_nominal(S0, S) :-
+    nombre(S0,S1),
+    atributo(color,S1,S).
 
 % determinante/objeto
 % por ejemplo: el pelo, en alajuela, etc
@@ -177,27 +226,24 @@ sintagma_verbal(S0, S) :-
     verbo(singular, S0, S1),
     sintagma_nominal(S1, S).
 
-
 % buscar_data se basa en que dependiendo de la palabra clave que se
-% encuentre en el input del usuario se decide que buscar dentro de los
-% famositicos
-% por ejemplo: en la oracion "ella nacio en alajuela" se busca una
-% palabra clave, en este caso "nacio". Como la palabra clave es nacio
-% busca si dentro del input del usuario hay algun dato (alguna edad),
-% que tambien tengan los famositicos
-
-buscar_data("es", L, Sexo) :-
-    famositico(_,_,_,_,_,_,Sexo),
+% encuentre en el input del usuario se decide que buscar
+% por ejemplo:
+% en la oracion "ella nacio en alajuela" se busca una palabra clave, en
+% este caso "nacio". Como la palabra clave es nacio busca si dentro del
+% input del usuario hay algun dato (alguna provincia en este caso), que
+ buscar_data("es", L, Sexo) :-
+    atributo([Sexo,_],_),
     buscar_palabra(Sexo, L),
     !.
 
 buscar_data("tiene", L, Edad) :-
-    famositico(_,Edad,_,_,_,_,_),
+    atributo([Edad,_],_),
     buscar_palabra(Edad, L),
     !.
 
 buscar_data("nacio", L, Lugar) :-
-    famositico(_,_,Lugar,_,_,_,_),
+    nombre([Lugar|_],_),
     buscar_palabra(Lugar, L),
     !.
 
@@ -208,28 +254,23 @@ buscar_data("tiene", L, Atributo) :-
     !.
 
 buscar_data("es", L, Profesion) :-
-    famositico(_,_,_,_,Profesion,_,_),
+    atributo([Profesion|_],_),
     buscar_palabra(Profesion, L),
     !.
 
-
 %atributo_fisico
 atributo_fisico("ojos", L, Atributo) :-
-    famositico(_,_,_,_,_,Atributo,_),
     atributo(color,[Atributo|_],_),
     buscar_palabra(Atributo, L).
 
 atributo_fisico("pelo", L, Atributo) :-
-    famositico(_,_,_,Atributo,_,_,_),
     atributo(color,[Atributo|_],_),
     buscar_palabra(Atributo, L).
-
 
 % si encuentra una palabra clave llama a buscar_data.
 determinar_dato_a_buscar(L, Palabra, Atributo) :-
     buscar_palabra_clave(L, Palabra),
     buscar_data(Palabra, L, Atributo).
-
 
 % busca la palabra clave en la lista con las palabras ingresadas por el
 % usuario basandose en las palabras clave que hay en la base de datos
@@ -238,19 +279,13 @@ buscar_palabra_clave(L, Palabra) :-
     buscar_palabra(Palabra, L),
     !.
 
+% funciona como la funcion miembro, busca un elemento dentro de una
+% lista
 buscar_palabra(Elemento, [Elemento|_]).
 
 buscar_palabra(Elemento, [_|Lista]) :-
     buscar_palabra(Elemento, Lista).
 
-% se usa para verificar que los atributos ingresados pertenezcan a algun
-% famositico dentro de la base de datos
-verificar_datos(L, Palabra, Atributo) :-
-    determinar_dato_a_buscar(L, Palabra, Atributo),!.
-
-verificar_datos(L, Palabra, Atributo) :-
-    not(determinar_dato_a_buscar(L, Palabra, Atributo)),
-    write("La base de datos no presenta a nadie con esas caracteristicas, vuelva a intentar"), false.
 
 concatenar([],L,L).
 concatenar([X|L1],L2,[X|L3]) :-
@@ -286,7 +321,7 @@ verifica_input("exit") :-
 akiticolog() :-
     write_ln("Escribe 'listo' para iniciar."),
     write_ln("Escribe 'no he decidido' si necesitas mas tiempo."),
-    write_ln("Escribe 'exit' en cualquier momento para terminar el programa."),
+    write_ln("Escribe 'exit' para cerrar AkiTicoLog."),
     write_ln(""),
     write_ln("Hola, soy AkiTicoLog y puedo adivinar un famositico en el que estes pensando."),write_ln(""),
     write_ln("Piensa en un famositico."),write_ln(""),
@@ -299,116 +334,68 @@ pregunta1(ListaAnterior) :-
     write_ln("Tu personaje es hombre o mujer?"),write_ln(""),
     read(Input),
     split_string(Input," ","",L),
-    write_ln(L),
     verificar_oracion(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
-    write_ln(Palabra),
-    write_ln(Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
-    write(ListaAtributos),
     pregunta2(ListaAtributos).
 
 
 
 pregunta2(ListaAnterior) :-
-    write_ln("      "),
+    write_ln(""),
     write_ln("Mmm interesante..."),
     write_ln("Que edad tiene tu personaje?"),
     read(Input),
     split_string(Input," ","",L),
-    write_ln(L),
     verificar_oracion(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
-    write_ln(Palabra),
-    write_ln(Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
-    write(ListaAtributos),
     pregunta3(ListaAtributos).
 
 
 pregunta3(ListaAnterior) :-
     write_ln("      "),
     write_ln("Aun no es suficiente para adivinar"),
-    write_ln("Dime cual es la profesion de tu famositico."),
+    write_ln("Dime cual es la profesion de tu famositico."), write_ln(""),
     read(Input),
     split_string(Input," ","",L),
-    write_ln(L),
     verificar_oracion(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
-    write_ln(Palabra),
-    write_ln(Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
-    write(ListaAtributos),
     pregunta4(ListaAtributos).
 
 
 pregunta4(ListaAnterior) :-
-    write_ln("      "),
-    write_ln("En que provincia nacio a persona en la que estas pensando?"),
+    write_ln(""),
+    write_ln("En que provincia nacio a persona en la que estas pensando?"), write_ln(""),
     read(Input),
     split_string(Input," ","",L),
-    write_ln(L),
     verificar_oracion(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
-    write_ln(Palabra),
-    write_ln(Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
-    write(ListaAtributos),
     pregunta5(ListaAtributos).
 
 pregunta5(ListaAnterior) :-
-    write_ln("      "),
+    write_ln(""),
     write_ln("Todavia necesito alguna caracteristica fisica"),
-    write_ln("De que color son los ojos de tu personaje?"),
+    write_ln("De que color son los ojos de tu personaje?"), write_ln(""),
     read(Input),
     split_string(Input," ","",L),
-    write_ln(L),
     verificar_oracion(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
-    write_ln(Palabra),
-    write_ln(Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
-    write(ListaAtributos),
     pregunta6(ListaAtributos).
 
 
 pregunta6(ListaAnterior) :-
-    write_ln("      "),
-   write_ln("Dime el color del cabello tambien."),
+    write_ln(""),
+    write_ln("Mejor dime el color del pelo tambien."), write_ln(""),
     read(Input),
     split_string(Input," ","",L),
-    write_ln(L),
     verificar_oracion(L),
     determinar_dato_a_buscar(L, Palabra, Atributo),
-    write_ln(Palabra),
-    write_ln(Atributo),
     concatenar([Atributo],ListaAnterior,ListaAtributos),
-    write(ListaAtributos),
     get_famositico(Famositico, ListaAtributos),
     write("Estas pensando en "),
-    write(Famositico).
-
-
-
-
-
-
-
-
-
-% ###por ahora esta fallando con las estaturas entonces estoy pensando
-% en quitar ese atributo de los famositicos###
-
-% idea: Pregunta 1: Formar una
-% lista con los famositicos que cumplen con el atributo ingresado por el
-% usuario. Pregunta 2: A partir de la lista formada en la pregunta 1,
-% dejar solo los famositicos que tambien cumplan con el atributo
-% ingresado por el usuario en la pregunta 2. Pregunta 3: A partir de la
-% lista formada en la pregunta 2, repetir los pasos y dejar en la lista
-% solo a los famositicos que cumplan con los atributos. De esta forma
-% solo estarian en la lista los famositicos que cumplan con los 3
-% diferentes atributos ingresados.
-
-% Seguir esta secuencia por todas las preguntas necesarias hasta tener
-% una lista de longitud = 1, que significa que solo hay un famositico
-% que cumple con todos esos atributos ingresados.
+    write(Famositico),
+    write("?"), write_ln("").
